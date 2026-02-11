@@ -17,12 +17,16 @@ struct ContentView: View {
                     Text("Details of \(user.name)")
                 } label: {
                     HStack {
-                        Text(user.name)
-                            .font(.headline)
+                        VStack(alignment: .leading) {
+                            Text(user.name)
+                                .font(.headline)
+                            Text(user.company)
+                                .font(.subheadline)
+                        }
                         
                         Spacer()
                         
-                        Text("\(user.friends.count)")
+                        Text(user.isActive ? "Active" : "Inactive")
                             .font(.subheadline)
                     }
                 }
