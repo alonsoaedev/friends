@@ -13,9 +13,7 @@ struct ContentView: View {
     var body: some View {
         NavigationStack {
             List(users) { user in
-                NavigationLink {
-                    Text("Details of \(user.name)")
-                } label: {
+                NavigationLink(value: user) {
                     HStack {
                         VStack(alignment: .leading) {
                             Text(user.name)
@@ -32,6 +30,9 @@ struct ContentView: View {
                 }
             }
             .navigationTitle("Friends")
+            .navigationDestination(for: User.self) { user in
+                UserDetailView(user: user)
+            }
             .task {
                 await fetchUsers()
             }

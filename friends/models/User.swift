@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct User: Codable, Identifiable {
+struct User: Codable, Identifiable, Hashable {
     var id = UUID()
     var isActive: Bool
     let name: String
@@ -19,7 +19,9 @@ struct User: Codable, Identifiable {
     var registered: Date
     var tags: [String]
     var friends: [Friend]
-    
+}
+
+extension User {
     init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         self.id = try container.decode(UUID.self, forKey: .id)
