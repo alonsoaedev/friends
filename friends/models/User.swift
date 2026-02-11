@@ -9,7 +9,7 @@ import Foundation
 
 struct User: Codable, Identifiable {
     var id = UUID()
-    var isactive: Bool
+    var isActive: Bool
     let name: String
     var age: Int
     var company: String
@@ -18,5 +18,5 @@ struct User: Codable, Identifiable {
     var about: String
     var registered: Date
     var tags: [String]
-    var firends: [Friend]
+    var friends: [Friend]
 }
