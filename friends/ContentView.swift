@@ -5,10 +5,12 @@
 //  Created by Alonso Acosta on 10/02/26.
 //
 
+import SwiftData
 import SwiftUI
 
 struct ContentView: View {
-    @State private var users: [User] = []
+    @Environment(\.modelContext) var modelContext
+    @Query var users: [User]
     
     var body: some View {
         NavigationStack {
@@ -29,27 +31,26 @@ struct ContentView: View {
                     }
                 }
             }
-            .navigationTitle("Friends")
+            .navigationTitle("Friends \(users.count)")
             .navigationDestination(for: User.self) { user in
                 UserDetailView(user: user)
             }
             .toolbar {
-                Button("Refresh") {
-                    Task {
-                        await fetchUsers()
-                    }
+                Button("Delete All", systemImage: "trash", role: .destructive) {
+                    try? modelContext.delete(model: User.self)
                 }
             }
             .task {
                 if users.isEmpty {
-                    await fetchUsers()
+                    await fetchUsers(storedIn: modelContext)
                 }
             }
         }
         .scrollBounceBehavior(.basedOnSize)
     }
     
-    func fetchUsers() async {
+    func fetchUsers(storedIn: ModelContext) async {
+        print("Fetching users...")
         let urlString = "https://www.hackingwithswift.com/samples/friendface.json"
         guard let url = URL(string: urlString) else {
             print("Invalid URL")
@@ -62,8 +63,10 @@ struct ContentView: View {
                 print("Failed to decode users")
                 return
             }
-            users = decodedUsers
-            print("Downloaded \(users.count) users")
+            
+            for user in decodedUsers {
+                storedIn.insert(user)
+            }
         } catch {
             print("Failed to fetch users")
             return
