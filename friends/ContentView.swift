@@ -8,14 +8,51 @@
 import SwiftUI
 
 struct ContentView: View {
+    @State private var users: [User] = []
+    
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+        NavigationStack {
+            List(users) { user in
+                NavigationLink {
+                    Text("Details of \(user.name)")
+                } label: {
+                    HStack {
+                        Text(user.name)
+                            .font(.headline)
+                        
+                        Spacer()
+                        
+                        Text("\(user.friends.count)")
+                            .font(.subheadline)
+                    }
+                }
+            }
+            .navigationTitle("Friends")
+            .task {
+                await fetchUsers()
+            }
         }
-        .padding()
+        .scrollBounceBehavior(.basedOnSize)
+    }
+    
+    func fetchUsers() async {
+        let urlString = "https://www.hackingwithswift.com/samples/friendface.json"
+        guard let url = URL(string: urlString) else {
+            print("Invalid URL")
+            return
+        }
+        
+        do {
+            let (data, _) = try await URLSession.shared.data(from: url)
+            guard let decodedUsers = try? JSONDecoder().decode([User].self, from: data) else {
+                print("Failed to decode users")
+                return
+            }
+            users = decodedUsers
+        } catch {
+            print("Failed to fetch users")
+            return
+        }
     }
 }
 
