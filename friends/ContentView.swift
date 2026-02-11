@@ -33,8 +33,17 @@ struct ContentView: View {
             .navigationDestination(for: User.self) { user in
                 UserDetailView(user: user)
             }
+            .toolbar {
+                Button("Refresh") {
+                    Task {
+                        await fetchUsers()
+                    }
+                }
+            }
             .task {
-                await fetchUsers()
+                if users.isEmpty {
+                    await fetchUsers()
+                }
             }
         }
         .scrollBounceBehavior(.basedOnSize)
@@ -54,6 +63,7 @@ struct ContentView: View {
                 return
             }
             users = decodedUsers
+            print("Downloaded \(users.count) users")
         } catch {
             print("Failed to fetch users")
             return
